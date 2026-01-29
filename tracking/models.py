@@ -1,39 +1,60 @@
 from django.db import models
 from django.contrib.auth.models import User
-from workout.models import WorkoutPlan, Exercise
+from workout.models import WorkoutPlans
 
-class WorkoutSession(models.Model):
-    STATUS_CHOICES = [
-        ('planned', 'Planned'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    ]
+class WorkoutReminders(models.Model):
+    user = models.ForeignKey('users.Users', models.DO_NOTHING)
+    plan = models.ForeignKey(WorkoutPlans, models.DO_NOTHING, blank=True, null=True)
+    reminder_time = models.TimeField()
+    recurrence = models.CharField(max_length=20)
+    recurrence_days = models.JSONField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    plan = models.ForeignKey(WorkoutPlan, on_delete=models.SET_NULL, null=True)
-    plan_name = models.CharField(max_length=255, null=True)
+    class Meta:
+        managed = False
+        db_table = 'workout_reminders'
+
+
+class WorkoutSessions(models.Model):
+    user = models.ForeignKey('users.Users', models.DO_NOTHING)
+    plan = models.ForeignKey(WorkoutPlans, models.DO_NOTHING, blank=True, null=True)
+    plan_name = models.CharField(max_length=255, blank=True, null=True)
     session_date = models.DateField()
     started_at = models.DateTimeField()
-    ended_at = models.DateTimeField(null=True, blank=True)
-    duration_minutes = models.IntegerField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planned')
-    overall_accuracy_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+    duration_minutes = models.IntegerField(blank=True, null=True)
+    status = models.CharField(max_length=20)
+    overall_accuracy_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if self.started_at and self.ended_at:
-            delta = self.ended_at - self.started_at
-            self.duration_minutes = int(delta.total_seconds() / 60)
-        super().save(*args, **kwargs)
+    class Meta:
+        managed = False
+        db_table = 'workout_sessions'
 
-class SessionExercise(models.Model):
-    session = models.ForeignKey(WorkoutSession, related_name='exercises', on_delete=models.CASCADE)
-    exercise = models.ForeignKey(Exercise, on_delete=models.RESTRICT)
+
+class SessionExercises(models.Model):
+    session = models.ForeignKey('WorkoutSessions', models.DO_NOTHING)
+    exercise = models.ForeignKey('workout.Exercises', models.DO_NOTHING)
     step_order = models.IntegerField()
-    completed_reps = models.IntegerField(null=True)
-    completed_seconds = models.IntegerField(null=True)
-    accuracy_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    target_reps = models.IntegerField(blank=True, null=True)
+    target_seconds = models.IntegerField(blank=True, null=True)
+    completed_reps = models.IntegerField(blank=True, null=True)
+    completed_seconds = models.IntegerField(blank=True, null=True)
+    accuracy_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
-class SessionSummary(models.Model):
-    session = models.OneToOneField(WorkoutSession, on_delete=models.CASCADE, primary_key=True)
+    class Meta:
+        managed = False
+        db_table = 'session_exercises'
+        unique_together = (('session', 'step_order'),)
+
+
+class SessionSummaries(models.Model):
+    session = models.OneToOneField('WorkoutSessions', models.DO_NOTHING, primary_key=True)
     summary_json = models.JSONField()
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'session_summaries'

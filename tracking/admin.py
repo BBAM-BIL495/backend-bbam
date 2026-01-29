@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import WorkoutSession, SessionExercise, SessionSummary
+from .models import WorkoutSessions, SessionExercises, SessionSummaries
 
-admin.site.register(WorkoutSession)
-admin.site.register(SessionExercise)
-admin.site.register(SessionSummary)
+admin.site.register(WorkoutSessions)
+admin.site.register(SessionExercises)
+admin.site.register(SessionSummaries)

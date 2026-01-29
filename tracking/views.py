@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions
-from .models import WorkoutSession, SessionExercise
+from .models import WorkoutSessions, SessionExercises
 from .serializers import WorkoutSessionSerializer
 
 class WorkoutSessionViewSet(viewsets.ModelViewSet):
@@ -12,7 +12,7 @@ class WorkoutSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return WorkoutSession.objects.filter(user=self.request.user).order_by('-session_date')
+        return WorkoutSessions.objects.filter(user=self.request.user).order_by('-session_date')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

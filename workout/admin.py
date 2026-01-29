@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Exercise, ExerciseRule, WorkoutPlan, WorkoutPlanItem
+from .models import Exercises, ExerciseRules, WorkoutPlans, WorkoutPlanItems
 
-admin.site.register(Exercise)
-admin.site.register(ExerciseRule)
-admin.site.register(WorkoutPlan)
-admin.site.register(WorkoutPlanItem)
+admin.site.register(Exercises)
+admin.site.register(ExerciseRules)
+admin.site.register(WorkoutPlans)
+admin.site.register(WorkoutPlanItems)

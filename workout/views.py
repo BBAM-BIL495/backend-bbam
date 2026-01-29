@@ -1,9 +1,9 @@
 from rest_framework import viewsets, permissions
-from .models import Exercise, WorkoutPlan
+from .models import Exercises, WorkoutPlans
 from .serializers import ExerciseSerializer, WorkoutPlanSerializer
 
 class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Exercise.objects.all()
+    queryset = Exercises.objects.all()
     serializer_class = ExerciseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -12,7 +12,7 @@ class WorkoutPlanViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return WorkoutPlan.objects.filter(user=self.request.user, deleted_at__isnull=True)
+        return WorkoutPlans.objects.filter(user=self.request.user, deleted_at__isnull=True)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

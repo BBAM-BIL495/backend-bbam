@@ -1,7 +1,7 @@
 from rest_framework import status, views
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfiles
 
 class RegisterView(views.APIView):
     permission_classes = []
@@ -17,6 +17,6 @@ class RegisterView(views.APIView):
             return Response({"error": "Email zaten kayıtlı"}, status=status.HTTP_409_CONFLICT)
 
         user = User.objects.create_user(username=email, email=email, password=password)
-        UserProfile.objects.create(user=user)
+        UserProfiles.objects.create(user=user)
 
         return Response({"message": "Başarılı", "user_id": user.id}, status=status.HTTP_201_CREATED)

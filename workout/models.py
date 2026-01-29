@@ -1,33 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Exercise(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    gif_url = models.URLField(max_length=500, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-class ExerciseRule(models.Model):
-    exercise = models.OneToOneField(Exercise, on_delete=models.CASCADE, related_name='rules')
+class ExerciseRules(models.Model):
+    exercise = models.OneToOneField('Exercises', models.DO_NOTHING)
     rules_json = models.JSONField()
-    is_active = models.BooleanField(default=True)
-
-class WorkoutPlan(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    plan_name = models.CharField(max_length=255)
-    deleted_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class WorkoutPlanItem(models.Model):
-    plan = models.ForeignKey(WorkoutPlan, related_name='items', on_delete=models.CASCADE)
-    exercise = models.ForeignKey(Exercise, on_delete=models.RESTRICT)
-    step_order = models.IntegerField()
-    target_reps = models.IntegerField(null=True, blank=True)
-    target_seconds = models.IntegerField(null=True, blank=True)
-    set_label = models.IntegerField(null=True, blank=True)
+    is_active = models.BooleanField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('plan', 'step_order')
+        managed = False
+        db_table = 'exercise_rules'
+
+class Exercises(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    gif_url = models.CharField(max_length=500, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'exercises'
+
+class WorkoutPlanItems(models.Model):
+    plan = models.ForeignKey('WorkoutPlans', models.DO_NOTHING)
+    step_order = models.IntegerField()
+    exercise = models.ForeignKey('workout.Exercises', models.DO_NOTHING)
+    target_reps = models.IntegerField(blank=True, null=True)
+    target_seconds = models.IntegerField(blank=True, null=True)
+    set_label = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'workout_plan_items'
+        unique_together = (('plan', 'step_order'),)
+
+
+class WorkoutPlans(models.Model):
+    user = models.ForeignKey('users.Users', models.DO_NOTHING)
+    plan_name = models.CharField(max_length=255)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'workout_plans'
