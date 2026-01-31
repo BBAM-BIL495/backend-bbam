@@ -1,8 +1,18 @@
-from rest_framework import status, views
+from rest_framework import status, views, viewsets
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from .models import UserProfiles
+from .models import AppUser, UserProfile
+from .serializers import AppUserSerializer, UserProfileSerializer
 
+class AppUserViewSet(viewsets.ModelViewSet):
+    queryset = AppUser.objects.all()
+    serializer_class = AppUserSerializer
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+"""
 class RegisterView(views.APIView):
     permission_classes = []
     
@@ -20,3 +30,4 @@ class RegisterView(views.APIView):
         UserProfiles.objects.create(user=user)
 
         return Response({"message": "Başarılı", "user_id": user.id}, status=status.HTTP_201_CREATED)
+"""

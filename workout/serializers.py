@@ -1,20 +1,34 @@
 from rest_framework import serializers
-from .models import Exercises, WorkoutPlans, WorkoutPlanItems
+from .models import Exercise, ExerciseRule, WorkoutPlan, WorkoutPlanItem, WorkoutReminder
 
 class ExerciseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Exercises
-        fields = ['id', 'name', 'description', 'gif_url']
+        model = Exercise
+        fields = '__all__'
+
+class ExerciseRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExerciseRule
+        fields = '__all__'
 
 class WorkoutPlanItemSerializer(serializers.ModelSerializer):
     exercise = ExerciseSerializer(read_only=True)
+    exercise_id = serializers.PrimaryKeyRelatedField(
+        queryset=Exercise.objects.all(), source='exercise', write_only=True
+    )
+
     class Meta:
-        model = WorkoutPlanItems
-        fields = ['exercise', 'exercise_details', 'step_order', 'target_reps', 'target_seconds', 'set_label']
+        model = WorkoutPlanItem
+        fields = ['id', 'exercise', 'exercise_id', 'step_order', 'target_reps', 'target_seconds', 'set_label']
 
 class WorkoutPlanSerializer(serializers.ModelSerializer):
-    items = WorkoutPlanItemSerializer(many=True, read_only=True)
+    items = WorkoutPlanItemSerializer(many=True, read_only=True, source='workoutplanitem_set')
     
     class Meta:
-        model = WorkoutPlans
+        model = WorkoutPlan
         fields = ['id', 'plan_name', 'items', 'created_at']
+
+class WorkoutReminderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkoutReminder
+        fields = '__all__'

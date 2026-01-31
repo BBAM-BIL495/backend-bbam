@@ -6,9 +6,9 @@ db kurulumu: postgresql içerisinde default servera giriş yapın ve içine bbam
 python manage.py inspectdb > models.py yapılmış halini commitledim, db değişikliğinde generate edilmeli ve models.py'lar değiştirilmelidir.
 python manage.py migrate --fake-initial yaptım ki olanı güncellesin eskiye ekleme yapmaya çalışmasın
 
-genel build alımı:
+genel build alımı VENV ICINDE:
 python manage.py makemigrations  
-python manage.py migrate --fake
+python manage.py migrate
 opsiyonel: python manage.py shell ile dbnin baglandıgı kontrol edilebilir
 python manage.py createsuperuser ile admin üyeliği oluşturulur
 python manage.py runserver

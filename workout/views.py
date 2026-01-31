@@ -1,18 +1,26 @@
-from rest_framework import viewsets, permissions
-from .models import Exercises, WorkoutPlans
-from .serializers import ExerciseSerializer, WorkoutPlanSerializer
+from rest_framework import viewsets
+from .models import Exercise, ExerciseRule, WorkoutPlan, WorkoutPlanItem, WorkoutReminder
+from .serializers import (
+    ExerciseSerializer, ExerciseRuleSerializer, 
+    WorkoutPlanSerializer, WorkoutPlanItemSerializer, WorkoutReminderSerializer
+)
 
-class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Exercises.objects.all()
+class ExerciseViewSet(viewsets.ModelViewSet):
+    queryset = Exercise.objects.all()
     serializer_class = ExerciseSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+class ExerciseRuleViewSet(viewsets.ModelViewSet):
+    queryset = ExerciseRule.objects.all()
+    serializer_class = ExerciseRuleSerializer
 
 class WorkoutPlanViewSet(viewsets.ModelViewSet):
+    queryset = WorkoutPlan.objects.all()
     serializer_class = WorkoutPlanSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return WorkoutPlans.objects.filter(user=self.request.user, deleted_at__isnull=True)
+class WorkoutPlanItemViewSet(viewsets.ModelViewSet):
+    queryset = WorkoutPlanItem.objects.all()
+    serializer_class = WorkoutPlanItemSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+class WorkoutReminderViewSet(viewsets.ModelViewSet):
+    queryset = WorkoutReminder.objects.all()
+    serializer_class = WorkoutReminderSerializer

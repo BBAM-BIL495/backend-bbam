@@ -1,18 +1,17 @@
-from rest_framework import viewsets, permissions
-from .models import WorkoutSessions, SessionExercises
-from .serializers import WorkoutSessionSerializer
+from rest_framework import viewsets
+from .models import WorkoutSession, SessionExercise, SessionSummary
+from .serializers import (
+    WorkoutSessionSerializer, SessionExerciseSerializer, SessionSummarySerializer
+)
 
 class WorkoutSessionViewSet(viewsets.ModelViewSet):
-    """
-    Antrenman oturumlarını yöneten API uç noktası.
-    POST: Yeni oturum başlatır.
-    GET: Kullanıcının geçmiş oturumlarını listeler[cite: 399].
-    """
+    queryset = WorkoutSession.objects.all()
     serializer_class = WorkoutSessionSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return WorkoutSessions.objects.filter(user=self.request.user).order_by('-session_date')
+class SessionExerciseViewSet(viewsets.ModelViewSet):
+    queryset = SessionExercise.objects.all()
+    serializer_class = SessionExerciseSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+class SessionSummaryViewSet(viewsets.ModelViewSet):
+    queryset = SessionSummary.objects.all()
+    serializer_class = SessionSummarySerializer
