@@ -1,17 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (
-    ExerciseViewSet, ExerciseRuleViewSet, 
-    WorkoutPlanViewSet, WorkoutPlanItemViewSet, WorkoutReminderViewSet
-)
+from .views import WorkoutController, ExerciseLibraryViewSet, NotificationController
 
 router = DefaultRouter()
-router.register(r'exercises', ExerciseViewSet)
-router.register(r'rules', ExerciseRuleViewSet)
-router.register(r'plans', WorkoutPlanViewSet)
-router.register(r'plan-items', WorkoutPlanItemViewSet)
-router.register(r'reminders', WorkoutReminderViewSet)
+router.register(r'plans', WorkoutController, basename='plans')
+router.register(r'exercises', ExerciseLibraryViewSet, basename='exercises')
+router.register(r'reminders', NotificationController, basename='reminders')
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = [path('', include(router.urls))]

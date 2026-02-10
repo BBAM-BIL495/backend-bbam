@@ -1,33 +1,34 @@
-from rest_framework import status, views, viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from .models import AppUser, UserProfile
 from .serializers import AppUserSerializer, UserProfileSerializer
 
-class AppUserViewSet(viewsets.ModelViewSet):
+class UserManager:
+    @staticmethod
+    def register_user(email, password):
+        user = AppUser.objects.create(email=email, password_hash=password)
+        UserProfile.objects.create(user=user)
+        return user
+
+class UserController(viewsets.ModelViewSet):
     queryset = AppUser.objects.all()
     serializer_class = AppUserSerializer
 
+    def create(self, request):
+        user = UserManager.register_user(request.data['email'], request.data['password'])
+        return Response({"user_id": user.id, "message": "user created successfully!!"}, status=status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        from .services import UserManager, TokenService
+        user = UserManager.validate_credentials(request.data['email'], request.data['password'])
+        if user:
+            token = TokenService.generate_jwt(user)
+            return Response({"token": token, "user_id": user.id})
+        return Response({"error": "Invalid credentials"}, status=401)
+    
+    
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-
-"""
-class RegisterView(views.APIView):
-    permission_classes = []
-    
-    def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-
-        if not email or not password:
-            return Response({"error": "Eksik bilgi"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if User.objects.filter(username=email).exists():
-            return Response({"error": "Email zaten kayıtlı"}, status=status.HTTP_409_CONFLICT)
-
-        user = User.objects.create_user(username=email, email=email, password=password)
-        UserProfiles.objects.create(user=user)
-
-        return Response({"message": "Başarılı", "user_id": user.id}, status=status.HTTP_201_CREATED)
-"""
